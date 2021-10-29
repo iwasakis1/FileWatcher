@@ -38,12 +38,10 @@
 
         ListBox1.Items.Add("aaaaa")
 
-
         If Not (watcher Is Nothing) Then
             Return
         End If
 
-        watcher = New System.IO.FileSystemWatcher
         '監視するディレクトリを指定
         watcher.Path = TextBox1.Text
         '最終アクセス日時、最終更新日時、ファイル、フォルダ名の変更を監視する
@@ -67,6 +65,7 @@
         '監視を開始する
         watcher.EnableRaisingEvents = True
         ListBox1.Items.Add("監視を開始しました。")
+        ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
 
     End Sub
 
@@ -84,19 +83,25 @@
                 ListBox1.Items.Add(("ファイル 「" + e.FullPath +
                     "」が削除されました。"))
         End Select
+        ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
+
     End Sub
 
     Private Sub watcher_Renamed(ByVal source As System.Object,
         ByVal e As System.IO.RenamedEventArgs)
         ListBox1.Items.Add(("ファイル 「" + e.FullPath +
             "」の名前が変更されました。"))
+        ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         '監視を終了
-        watcher.EnableRaisingEvents = False
-        watcher.Dispose()
-        watcher = Nothing
+        If Not (watcher Is Nothing) Then
+            watcher.EnableRaisingEvents = False
+            watcher.Dispose()
+            watcher = Nothing
+        End If
         ListBox1.Items.Add("監視を終了しました。")
+        ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
     End Sub
 End Class
