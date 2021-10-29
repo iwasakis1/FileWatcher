@@ -36,11 +36,13 @@
         ListBox1.Items.Clear()
 
 
-        ListBox1.Items.Add("aaaaa")
+        'ListBox1.Items.Add("aaaaa")
 
         If Not (watcher Is Nothing) Then
             Return
         End If
+
+        watcher = New System.IO.FileSystemWatcher
 
         '監視するディレクトリを指定
         watcher.Path = TextBox1.Text
