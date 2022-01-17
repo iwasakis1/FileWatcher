@@ -43,29 +43,38 @@
         End If
 
         watcher = New System.IO.FileSystemWatcher
+        Try
+            '監視するディレクトリを指定
+            watcher.Path = TextBox1.Text
+            '最終アクセス日時、最終更新日時、ファイル、フォルダ名の変更を監視する
+            watcher.NotifyFilter = System.IO.NotifyFilters.LastAccess Or
+                System.IO.NotifyFilters.LastWrite Or
+                System.IO.NotifyFilters.FileName Or
+                System.IO.NotifyFilters.DirectoryName
+            'すべてのファイルを監視
+            watcher.Filter = ""
+            watcher.IncludeSubdirectories = True
+            'UIのスレッドにマーシャリングする
+            'コンソールアプリケーションでの使用では必要ない
+            watcher.SynchronizingObject = Me
 
-        '監視するディレクトリを指定
-        watcher.Path = TextBox1.Text
-        '最終アクセス日時、最終更新日時、ファイル、フォルダ名の変更を監視する
-        watcher.NotifyFilter = System.IO.NotifyFilters.LastAccess Or
-            System.IO.NotifyFilters.LastWrite Or
-            System.IO.NotifyFilters.FileName Or
-            System.IO.NotifyFilters.DirectoryName
-        'すべてのファイルを監視
-        watcher.Filter = ""
-        watcher.IncludeSubdirectories = True
-        'UIのスレッドにマーシャリングする
-        'コンソールアプリケーションでの使用では必要ない
-        watcher.SynchronizingObject = Me
+            'イベントハンドラの追加
+            AddHandler watcher.Changed, AddressOf watcher_Changed
+            AddHandler watcher.Created, AddressOf watcher_Changed
+            AddHandler watcher.Deleted, AddressOf watcher_Changed
+            AddHandler watcher.Renamed, AddressOf watcher_Renamed
 
-        'イベントハンドラの追加
-        AddHandler watcher.Changed, AddressOf watcher_Changed
-        AddHandler watcher.Created, AddressOf watcher_Changed
-        AddHandler watcher.Deleted, AddressOf watcher_Changed
-        AddHandler watcher.Renamed, AddressOf watcher_Renamed
-
-        '監視を開始する
-        watcher.EnableRaisingEvents = True
+            '監視を開始する
+            watcher.EnableRaisingEvents = True
+        Catch ex As Exception
+            MsgBox(ex.ToString)
+            ListBox1.Items.Add("監視を開始出来ませんでした。")
+            If Not (watcher Is Nothing) Then
+                watcher.Dispose()
+                watcher = Nothing
+            End If
+            Exit Sub
+        End Try
         ListBox1.Items.Add("監視を開始しました。")
         ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
 
@@ -97,6 +106,11 @@
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        If watcher Is Nothing OrElse Not watcher.EnableRaisingEvents Then
+            ListBox1.Items.Add("監視していません。")
+            ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
+            Exit Sub
+        End If
         '監視を終了
         If Not (watcher Is Nothing) Then
             watcher.EnableRaisingEvents = False
