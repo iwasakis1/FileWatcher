@@ -1,13 +1,6 @@
-﻿Public Class Form1
+﻿Imports System.Reflection
 
-
-
-
-
-
-
-
-
+Public Class Form1
     Private Sub TextBox1_DragEnter(sender As Object, e As DragEventArgs) Handles TextBox1.DragEnter
         'ファイル形式の場合のみ、ドラッグを受け付けます。
         If e.Data.GetDataPresent(DataFormats.FileDrop) = True Then
@@ -83,15 +76,18 @@
     'イベントハンドラ
     Private Sub watcher_Changed(ByVal source As System.Object,
         ByVal e As System.IO.FileSystemEventArgs)
+        Dim d = Now
+        Dim s = $"{d.ToLongTimeString} {d.ToString("MM/dd")} "
+
         Select Case e.ChangeType
             Case System.IO.WatcherChangeTypes.Changed
-                ListBox1.Items.Add(("ファイル 「" + e.FullPath +
+                ListBox1.Items.Add((s & "ファイル 「" + e.FullPath +
                     "」が変更されました。"))
             Case System.IO.WatcherChangeTypes.Created
-                ListBox1.Items.Add(("ファイル 「" + e.FullPath +
+                ListBox1.Items.Add((s & "ファイル 「" + e.FullPath +
                     "」が作成されました。"))
             Case System.IO.WatcherChangeTypes.Deleted
-                ListBox1.Items.Add(("ファイル 「" + e.FullPath +
+                ListBox1.Items.Add((s & "ファイル 「" + e.FullPath +
                     "」が削除されました。"))
         End Select
         ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
@@ -119,5 +115,15 @@
         End If
         ListBox1.Items.Add("監視を終了しました。")
         ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
+        Me.SetStyle(ControlStyles.ResizeRedraw, True)
+        Me.SetStyle(ControlStyles.DoubleBuffer, True)
+        Me.SetStyle(ControlStyles.UserPaint, True)
+        Me.SetStyle(ControlStyles.AllPaintingInWmPaint, True)
+
+        Dim version As Version = Assembly.GetExecutingAssembly().GetName().Version
+        Label1.Text = String.Format("Version {0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision)
     End Sub
 End Class
