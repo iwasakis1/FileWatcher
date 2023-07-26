@@ -96,7 +96,11 @@ Public Class Form1
 
     Private Sub watcher_Renamed(ByVal source As System.Object,
         ByVal e As System.IO.RenamedEventArgs)
-        ListBox1.Items.Add(("ファイル 「" + e.FullPath +
+
+        Dim d = Now
+        Dim s = $"{d.ToLongTimeString} {d.ToString("MM/dd")} "
+
+        ListBox1.Items.Add((s & "ファイル 「" + e.FullPath +
             "」の名前が変更されました。"))
         ListBox1.SelectedIndex = ListBox1.Items.Count() - 1
     End Sub
